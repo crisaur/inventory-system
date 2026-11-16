@@ -1,3 +1,8 @@
 products.csv
-inventory.db
-invoice.pdf 
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Local SQLite database & sensitive invoices (optional, recommended so supplier invoices aren't pushed publicly)
+*.db
+*.pdf

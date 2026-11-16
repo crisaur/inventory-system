@@ -1,10 +1,10 @@
 import csv 
 
 data = [
-    ['Barcode', 'Name', 'Price'],
-    ['05000159461122', 'Snickers', '1'],
-    ['5000159407236', 'Mars', '2'],
-    ['5000159459228', 'Twix', '3'],
+    ['SKU', 'Name', 'Price'],
+    ['297899', 'Cad Drinking Hot Choc', '1.00'],
+    ['324317', 'McV Dark Choc Digs', '1.00'],
+    ['306537', 'Fanta Lemon', '1.00'],
 ]
 
 with open('products.csv', 'w', newline='') as file:
