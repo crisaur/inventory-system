@@ -16,13 +16,7 @@ engine = create_engine("sqlite:///inventory.db", echo=False)
 metadata_object.create_all(engine)
 
 
-def upsert_product(sku: int, name: str, price: float):
-    """
-    Searches inventory.db by SKU:
-    - If SKU exists and new price > current price -> updates the price
-    - If SKU exists and new price <= current price -> skips update
-    - If SKU is new -> inserts the new product
-    """
+def upsert_product(sku: int, name: str, price: float) -> dict:
     with engine.begin() as connection:
         existing = connection.execute(
             select(inventory_table.c.price).where(inventory_table.c.sku == sku)
@@ -36,14 +30,14 @@ def upsert_product(sku: int, name: str, price: float):
                     .where(inventory_table.c.sku == sku)
                     .values(price=price)
                 )
-                print(f"[UPDATED] SKU {sku} ({name}): £{old_price:.2f} -> £{price:.2f}")
+                return {"SKU": sku, "Name": name, "Status": "UPDATED", "Old Price": old_price, "New Price": price}
             else:
-                print(f"[SKIPPED] SKU {sku} ({name}): new price £{price:.2f} is not higher than £{old_price:.2f}")
+                return {"SKU": sku, "Name": name, "Status": "SKIPPED", "Old Price": old_price, "New Price": price}
         else:
             connection.execute(
                 insert(inventory_table).values(sku=sku, name=name, price=price)
             )
-            print(f"[ADDED] SKU {sku} ({name}): £{price:.2f}")
+            return {"SKU": sku, "Name": name, "Status": "ADDED", "Old Price": None, "New Price": price}
 
 
 def read_csv_and_insert_data(csv_path: str = "products.csv"):

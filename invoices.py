@@ -3,9 +3,9 @@ import re
 import pdfplumber
 from database import upsert_product
 
-def process_booker_invoice(pdf_path: str):
-    print(f"Scanning {pdf_path}...")
-    with pdfplumber.open(pdf_path) as pdf:
+def process_booker_invoice(pdf_source) -> list[dict]:
+    results = []
+    with pdfplumber.open(pdf_source) as pdf:
         for page in pdf.pages:
             words = page.extract_words()
             if not words:
@@ -55,7 +55,9 @@ def process_booker_invoice(pdf_path: str):
                 rrp = float(prices[-1])
 
                 # Searches inventory.db -> updates if higher, skips if lower/equal, adds if new
-                upsert_product(sku=sku, name=clean_name, price=rrp)
+                status_log = upsert_product(sku=sku, name=clean_name, price=rrp)
+                results.append(status_log)
+    return results
 
 if __name__ == "__main__":
     # Allows running: python invoices.py new_invoice.pdf
